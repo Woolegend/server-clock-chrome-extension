@@ -1,0 +1,120 @@
+/* --- 창 기본 스타일 --- */
+
+#server-time-pip {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2147483647;
+
+  box-sizing: border-box;
+  width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: white;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* --- 드래그 핸들 --- */
+#server-time-pip-handle {
+  box-sizing: border-box; /* 스타일 충돌 방지 */
+  width: 100%;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background-color: #f1f1f1;
+
+  cursor: move; /* 마우스 모양: 이동 */
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+}
+
+/* --- 콘텐츠 영역 --- */
+
+#server-time-pip-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+}
+
+/* --- 나머지 스타일 (모두 #server-time-pip 로 시작) --- */
+
+#server-time-pip h1 {
+  margin: 0 0 10px 0;
+
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+#server-time-pip .input-group {
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+#server-time-pip #url-input {
+  flex-grow: 1;
+
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+
+  font-size: 14px;
+}
+
+#server-time-pip #check-btn {
+  background-color: #007bff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 0 4px 4px 0;
+
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+}
+
+#server-time-pip #check-btn:hover {
+  background-color: #0056b3;
+}
+
+#server-time-pip #result-area {
+  box-sizing: border-box;
+  background-color: #f4f4f4;
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 5px;
+
+  text-align: center;
+}
+
+#server-time-pip #server-time-display {
+  margin: 0;
+
+  font-size: 22px;
+  font-weight: bold;
+  color: #000;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
+    monospace;
+}
+
+#server-time-pip .status {
+  min-height: 1.2em;
+
+  font-size: 12px;
+}
+
+#server-time-pip .status.error {
+  color: #d93025;
+}
+
+#server-time-pip .status.success {
+  color: #1a73e8;
+}

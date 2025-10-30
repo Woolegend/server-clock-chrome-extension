@@ -1,0 +1,13 @@
+#macOS
+.DS_Store
+
+#Windows
+Thumbs.db
+
+#build files
+*.zip
+*.crx
+
+#etc
+.vscode/
+*.log
