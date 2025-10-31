@@ -3,12 +3,18 @@
   "name": "서버 시계 크롬 익스텐션",
   "version": "0.1",
   "description": "페이지 위에 떠다니는 서버 시계",
+  "icons": {
+    "16": "public/icons/icon16.png",
+    "32": "public/icons/icon32.png",
+    "48": "public/icons/icon48.png",
+    "128": "public/icons/icon128.png"
+  },
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_title": "서버 시간 확인기 켜기/끄기"
   },
-  "permissions": ["scripting", "storage"],
+  "permissions": ["scripting", "storage", "favicon"],
   "host_permissions": ["<all_urls>"]
 }
