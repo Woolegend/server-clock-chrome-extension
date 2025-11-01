@@ -1,13 +1,13 @@
 /* --- 창 기본 스타일 --- */
 
-#server-time-pip {
+#server-clock {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 2147483647;
 
   box-sizing: border-box;
-  width: 300px;
+  width: 320px;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -17,7 +17,7 @@
 }
 
 /* --- 드래그 핸들 --- */
-#server-time-pip-handle {
+#server-clock-handle {
   box-sizing: border-box; /* 스타일 충돌 방지 */
   width: 100%;
   padding: 8px;
@@ -44,7 +44,7 @@
 
 /* --- 나머지 스타일 (모두 #server-time-pip 로 시작) --- */
 
-#server-time-pip h1 {
+#server-clock h1 {
   margin: 0 0 10px 0;
 
   font-size: 18px;
@@ -52,13 +52,13 @@
   color: #333;
 }
 
-#server-time-pip .input-group {
+#server-clock .input-group {
   display: flex;
   width: 100%;
   margin-bottom: 10px;
 }
 
-#server-time-pip #url-input {
+#server-clock #input-url {
   flex-grow: 1;
 
   padding: 8px;
@@ -68,7 +68,7 @@
   font-size: 14px;
 }
 
-#server-time-pip #check-btn {
+#server-clock #check-btn {
   background-color: #007bff;
   padding: 8px 12px;
   border: none;
@@ -79,11 +79,7 @@
   color: white;
 }
 
-#server-time-pip #check-btn:hover {
-  background-color: #0056b3;
-}
-
-#server-time-pip #result-area {
+#server-clock #result-area {
   box-sizing: border-box;
   background-color: #f4f4f4;
   width: 100%;
@@ -95,7 +91,7 @@
   text-align: center;
 }
 
-#server-time-pip #server-time-display {
+#server-clock #server-time-display {
   margin: 0;
 
   font-size: 22px;
@@ -105,16 +101,16 @@
     monospace;
 }
 
-#server-time-pip .status {
+#server-clock .status {
   min-height: 1.2em;
 
   font-size: 12px;
 }
 
-#server-time-pip .status.error {
+#server-clock .status.error {
   color: #d93025;
 }
 
-#server-time-pip .status.success {
+#server-clock .status.success {
   color: #1a73e8;
 }

@@ -1,6 +1,6 @@
 // IIFE
 (async function () {
-  const ROOT_ID = "server-time-pip";
+  const ROOT_ID = "server-clock";
   /**
    * --- 1. UI 토글 및 생성 ---
    * 이미 UI가 렌더링 되었다면 토글만 하고 종료.
@@ -13,47 +13,101 @@
     return;
   }
 
-  const uiContainer = document.createElement("div");
-  uiContainer.id = ROOT_ID;
+  const container = document.createElement("div");
+  container.id = ROOT_ID;
 
   /**
-   * --- 저장된 PIP 위치 불러오기/적용 ---
-   * 이전 위치가 저장되어 있다면 불러와서 적용.
+   * ANCHOR 드래그 핸들
    */
+  const handle = document.createElement("div");
+  handle.id = "server-clock-handle";
+  handle.textContent = ":: 드래그 ::";
+
   const storedPos = await chrome.storage.local.get("pipPosition");
   if (storedPos.pipPosition) {
-    uiContainer.style.left = storedPos.pipPosition.x;
-    uiContainer.style.top = storedPos.pipPosition.y;
-    uiContainer.style.right = "auto";
+    container.style.left = storedPos.pipPosition.x;
+    container.style.top = storedPos.pipPosition.y;
+    container.style.right = "auto";
   }
 
-  // PIP UI 드래그(이동)을 위한 핸들 컴포넌트
-  const serverTimePipHandle = document.createElement("div");
-  serverTimePipHandle.id = "server-time-pip-handle";
-  serverTimePipHandle.textContent = ":: 드래그 ::";
+  let isDragging = false;
+  let offset = { x: 0, y: 0 };
 
-  /** 전체 컨텐츠 랩퍼 */
-  const serverTimePipContent = document.createElement("div");
-  serverTimePipContent.id = "server-time-pip-content";
-  serverTimeHeadTitle = document.createElement("h1");
-  serverTimeHeadTitle.textContent = "서버 시간 확인기";
+  handle.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    offset.x = e.clientX - container.offsetLeft;
+    offset.y = e.clientY - container.offsetTop;
+    document.body.style.userSelect = "none";
+  });
 
-  /** 입력 필드와 관련 요소를 감싸는 그룹 */
+  document.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+    // 마우스 위치에서 간격을 빼서 창의 새 위치 계산
+    let newX = e.clientX - offset.x;
+    let newY = e.clientY - offset.y;
+    container.style.left = `${newX}px`;
+    container.style.top = `${newY}px`;
+  });
+
+  // 마우스 버튼을 뗐을 때 (드래그 종료)
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+    // 텍스트 선택 방지 해제
+    document.body.style.userSelect = "";
+  });
+
+  /**
+   * ANCHOR 메인 컨텐츠 랩퍼
+   */
+  const contentWrapper = document.createElement("div");
+  contentWrapper.id = "server-time-pip-content";
+  const headTitle = document.createElement("h1");
+  headTitle.textContent = "서버 시간 확인기";
+
+  /**
+   * ANCHOR 입력 관련 요소
+   */
   const inputGroup = document.createElement("div");
   inputGroup.className = "input-group";
 
-  /** URL 입력 필드 */
-  const urlInputField = document.createElement("input");
-  urlInputField.type = "text";
-  urlInputField.id = "url-input";
-  urlInputField.placeholder = "https://nol.interpark.com";
+  const inputField = document.createElement("input");
+  inputField.type = "text";
+  inputField.id = "input-url";
+  inputField.placeholder = "https://naver.com";
 
-  /** 서버 시간 확인 버튼 */
   const checkButton = document.createElement("button");
   checkButton.id = "check-btn";
   checkButton.textContent = "확인";
-  inputGroup.appendChild(urlInputField);
+  inputGroup.appendChild(inputField);
   inputGroup.appendChild(checkButton);
+
+  const recommandedSites = [
+    { name: "네이버", url: "https://www.naver.com" },
+    { name: "티켓링크", url: "https://www.ticketlink.co.kr/home" },
+    { name: "인터파크", url: "https://nol.interpark.com/" },
+  ];
+
+  const favoritesContainer = document.createElement("div");
+  favoritesContainer.id = "server-time-pip-favorites";
+
+  recommandedSites.forEach((site) => {
+    const btn = document.createElement("button");
+    btn.className = "fav-btn";
+    btn.title = `${site.name} (${site.url})`;
+
+    const img = document.createElement("img");
+    img.src = `https://www.google.com/s2/favicons?domain=${site.url}&sz=16`;
+    img.alt = site.name;
+
+    btn.appendChild(img);
+
+    btn.addEventListener("click", () => {
+      inputField.value = site.url;
+      checkBtn.click(); // '확인' 버튼을 코드로 클릭
+    });
+
+    favoritesContainer.appendChild(btn);
+  });
 
   /** 서버 시간 결과를 표시하는 영역 */
   const resultArea = document.createElement("div");
@@ -70,62 +124,36 @@
   statusMessage.className = "status";
   statusMessage.id = "status-message";
 
-  serverTimePipContent.appendChild(serverTimeHeadTitle);
-  serverTimePipContent.appendChild(inputGroup);
-  serverTimePipContent.appendChild(resultArea);
-  serverTimePipContent.appendChild(statusMessage);
+  contentWrapper.appendChild(headTitle);
+  contentWrapper.appendChild(inputGroup);
+  contentWrapper.appendChild(favoritesContainer);
+  contentWrapper.appendChild(resultArea);
+  contentWrapper.appendChild(statusMessage);
 
-  uiContainer.appendChild(serverTimePipHandle);
-  uiContainer.appendChild(serverTimePipContent);
+  container.appendChild(handle);
+  container.appendChild(contentWrapper);
 
   // 웹페이지의 body에 UI를 추가합니다.
-  document.body.appendChild(uiContainer);
-
-  // --- 2. 드래그 로직 추가 ---
-  const handle = document.getElementById("server-time-pip-handle");
-  let isDragging = false;
-  let offset = { x: 0, y: 0 };
-
-  // 마우스 버튼을 눌렀을 때 (드래그 시작)
-  handle.addEventListener("mousedown", (e) => {
-    isDragging = true;
-
-    // 현재 마우스 위치와 창의 왼쪽 상단 모서리 사이의 간격 계산
-    offset.x = e.clientX - uiContainer.offsetLeft;
-    offset.y = e.clientY - uiContainer.offsetTop;
-    // 드래그 중 텍스트가 선택되는 것을 방지
-    document.body.style.userSelect = "none";
-  });
-
-  document.addEventListener("mousemove", (e) => {
-    if (!isDragging) return;
-    // 마우스 위치에서 간격을 빼서 창의 새 위치 계산
-    let newX = e.clientX - offset.x;
-    let newY = e.clientY - offset.y;
-    uiContainer.style.left = `${newX}px`;
-    uiContainer.style.top = `${newY}px`;
-  });
-
-  // 마우스 버튼을 뗐을 때 (드래그 종료)
-  document.addEventListener("mouseup", () => {
-    isDragging = false;
-    // 텍스트 선택 방지 해제
-    document.body.style.userSelect = "";
-  });
+  document.body.appendChild(container);
 
   // --- 3. 서버 시간 확인 로직 (기존 popup.js와 동일) ---
   // UI 요소들을 가져옵니다. (document.getElementById 사용 가능)
-  const urlInput = document.getElementById("url-input");
   const checkBtn = document.getElementById("check-btn");
   const timeDisplay = document.getElementById("server-time-display");
   const statusMsg = document.getElementById("status-message");
   let clockInterval = null;
 
   checkBtn.addEventListener("click", () => {
-    const url = urlInput.value;
+    const url = document.getElementById("input-url")?.value.trim();
+
+    if (!url) {
+      return;
+    }
+
     if (clockInterval) {
       clearInterval(clockInterval);
     }
+
     if (!url || !url.startsWith("http")) {
       statusMsg.textContent = "올바른 URL을 입력하세요 (예: https://...)";
       statusMsg.className = "status error";
@@ -179,5 +207,3 @@
     clockInterval = setInterval(updateClock, 1000); // 1초마다 실행
   }
 })(); // 즉시 실행 함수 종료
-
-// https://hyung1.tistory.com/77
